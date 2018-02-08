@@ -1,0 +1,79 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile 'org.json:json:20160810'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+}
+
+repositories {
+    mavenCentral()
+}
+
+//for local maven repo
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: LOCAL_REPO_URL)
+        pom.groupId = PROJ_GROUP
+        pom.artifactId = PROJ_ARTIFACTID
+        pom.version = PROJ_VERSION
+    }
+}
+
+
+apply plugin: 'com.jfrog.bintray'
+
+version = PROJ_VERSION
+group = PROJ_GROUP
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'jar'
+                // Add your description here
+                name 'gradle plugin for android test'     //项目描述
+                url ""
+                // Set your license
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'heavy-james'
+                        name 'heavy james'
+                        email 'zhanhaifei@126.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        userOrg = "yourOrg"//JCenter上创建的的Organization
+        repo = "maven"//你要上传的库的名字
+        name = "your project name"    //发布到JCenter上的项目名字
+        websiteUrl = ""
+        vcsUrl = "your vcs url"
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
+}

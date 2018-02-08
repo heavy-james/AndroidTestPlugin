@@ -1,2 +1,3 @@
-# AndroidTestPlugin
-gradle puglin for android test
+# README
+
+this is an gradle plugin for android test.
