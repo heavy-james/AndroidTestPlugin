@@ -34,6 +34,10 @@ public class LogUtil {
         LogUtil.d(TAG, "LogUtil setMode debug-->" + debug + "; saveLog-->" + saveLog);
     }
 
+    public static void setLogLevel(int logLevel) {
+        mLogLevel = logLevel;
+    }
+
     public static void v(String tag, String content) {
         ActionInfo actionInfo = new ActionInfo("VERBOSE", TAG, "[" + tag + "]:" + content);
         if (canPrint(LEVEL_VERBOSE)) {

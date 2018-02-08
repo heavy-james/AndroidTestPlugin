@@ -1,14 +1,14 @@
 package heavy.test.plugin.logic;
 
-import heavy.test.plugin.logic.command.RecordResult;
-import heavy.test.plugin.util.TextUtil;
-import heavy.test.plugin.util.FileUtil;
-
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import heavy.test.plugin.logic.command.RecordResult;
+import heavy.test.plugin.util.FileUtil;
+import heavy.test.plugin.util.TextUtil;
 
 /**
  * Created by heavy on 2017/6/1.
@@ -21,6 +21,7 @@ public class TestResultRecorder {
     private static final String TAG = "TestResultRecorder";
     public boolean isWriteThreadLive;
     String mResultFileName;
+    public boolean recordResult = true;
     private ConcurrentLinkedQueue<ActionInfo> tempQueue = new ConcurrentLinkedQueue<ActionInfo>();
 
     public TestResultRecorder() {
@@ -33,6 +34,22 @@ public class TestResultRecorder {
             deleteLogFile();
         }
     }
+
+    public void setResultFile(String resultFile) {
+        mResultFileName = resultFile;
+        if (isLogFileExist()) {
+            deleteLogFile();
+        }
+    }
+
+    public void setNeedRecordResult(boolean recordResult) {
+        this.recordResult = recordResult;
+    }
+
+    public boolean needRecordResult() {
+        return recordResult;
+    }
+
 
     public void record(RecordResult recordResult) {
 

@@ -1,18 +1,5 @@
 package heavy.test.plugin.logic;
 
-import heavy.test.plugin.logic.command.GetRuntimeValue;
-import heavy.test.plugin.logic.command.RecordResult;
-import heavy.test.plugin.logic.command.RunTestObject;
-import heavy.test.plugin.logic.transport.SocketClient;
-import heavy.test.plugin.model.data.TestContext;
-import heavy.test.plugin.model.data.TestObject;
-import heavy.test.plugin.model.data.interf.ITestObject;
-import heavy.test.plugin.model.data.reflection.RuntimeValue;
-import heavy.test.plugin.model.wrapper.testable.TestableWrapper;
-import heavy.test.plugin.model.data.TestBlock;
-import heavy.test.plugin.model.data.testable.global.ConditionedTestable;
-import heavy.test.plugin.util.LogUtil;
-
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -20,6 +7,18 @@ import java.net.Socket;
 import java.util.List;
 
 import groovy.lang.Closure;
+import heavy.test.plugin.logic.command.GetRuntimeValue;
+import heavy.test.plugin.logic.command.RecordResult;
+import heavy.test.plugin.logic.command.RunTestObject;
+import heavy.test.plugin.logic.transport.SocketClient;
+import heavy.test.plugin.model.data.TestBlock;
+import heavy.test.plugin.model.data.TestContext;
+import heavy.test.plugin.model.data.TestObject;
+import heavy.test.plugin.model.data.interf.ITestObject;
+import heavy.test.plugin.model.data.reflection.RuntimeValue;
+import heavy.test.plugin.model.data.testable.global.ConditionedTestable;
+import heavy.test.plugin.model.wrapper.testable.TestableWrapper;
+import heavy.test.plugin.util.LogUtil;
 
 /**
  * Created by heavy on 17/6/27.
@@ -28,13 +27,27 @@ import groovy.lang.Closure;
 public class TestManager {
 
     private static final String TAG = "TestManager";
+
     private static TestManager instance;
     SocketClient socketClient;
     TestResultRecorder testResult;
+    private boolean stopWhenError;
+    Closure whenTestError;
 
     private TestManager() {
+        testResult = new TestResultRecorder(TestConstants.getResultFileName());
+        initPort();
+    }
+
+    public static synchronized TestManager getInstance() {
+        if (instance == null) {
+            instance = new TestManager();
+        }
+        return instance;
+    }
+
+    private void initPort() {
         try {
-            testResult = new TestResultRecorder(TestConstants.getResultFileName());
             Thread.sleep(3000);
             LogUtil.d(TAG, "new socket start bind server");
             Socket socket = new Socket("127.0.0.1", 10086);
@@ -46,28 +59,54 @@ public class TestManager {
         }
     }
 
-    public static synchronized TestManager getInstance() {
-        if (instance == null) {
-            instance = new TestManager();
-        }
-        return instance;
+
+    public void setTestResultFile(String resultFile) {
+        testResult.setResultFile(resultFile);
+    }
+
+    public void needRecordResult(boolean recordResult) {
+        testResult.setNeedRecordResult(recordResult);
+    }
+
+    public void setWhenTestAbortClosure(Closure closure) {
+        whenTestError = closure;
+    }
+
+    public void setStopWhenError(boolean stopWhenError) {
+        this.stopWhenError = stopWhenError;
     }
 
     public boolean execute(TestCommand testCommand) throws RuntimeException {
         if (testCommand instanceof RecordResult) {
             RecordResult recordResult = (RecordResult) testCommand;
+            testResult.record(recordResult);
             if (recordResult.isFailed()) {
                 if (recordResult.isRunAsCondition()) {
                     return false;
                 } else {
-                    throw new RuntimeException(recordResult.getInfo());
+                    if (whenTestError != null) {
+                        whenTestError.call();
+                    }
+
+                    if (testResult.needRecordResult()) {
+                        for (String command : TestConstants.getTestDataCollectingCommands()) {
+                            LogUtil.d(TAG, "data collection executing : " + command);
+                            try {
+                                Process process = Runtime.getRuntime().exec(command);
+                                process.waitFor();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                LogUtil.e(TAG, "collecting data failed cause by : " + e.getMessage());
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    if (stopWhenError) {
+                        throw new RuntimeException(recordResult.getInfo());
+                    }
                 }
             }
-            testResult.record(recordResult);
-        }
-        if (testCommand instanceof GetRuntimeValue) {
-            GetRuntimeValue getRuntimeValue = (GetRuntimeValue) testCommand;
-
         }
         return true;
     }
@@ -78,22 +117,24 @@ public class TestManager {
     }
 
     public boolean sendForResult(TestCommand testCommand) {
+
         TestCommand responseCommand = null;
         if (socketClient != null && testCommand != null) {
             LogUtil.d(TAG, "sendForResult testCommand : " + testCommand.getJsonObject().toString());
             socketClient.println(testCommand.getJsonObject().toString());
             String resultString = socketClient.readLine();
-            if(resultString != null){
+            if (resultString != null) {
                 try {
                     LogUtil.d(TAG, "received string : " + resultString);
                     responseCommand = TestCommandFactory.createCommand(new JSONObject(resultString));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }else {
+            } else {
                 LogUtil.w(TAG, "received null string from test apk.");
             }
         }
+
         if (testCommand instanceof GetRuntimeValue) {
             GetRuntimeValue testCmd = (GetRuntimeValue) testCommand;
             if (responseCommand != null) {

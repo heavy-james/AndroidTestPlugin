@@ -1,13 +1,13 @@
 package heavy.test.plugin.gradle
 
+import heavy.test.plugin.model.wrapper.TestConfigWrapper
 import heavy.test.plugin.model.wrapper.TestWrapper
 import heavy.test.plugin.util.LogUtil
 import heavy.test.plugin.util.ProcessUtil
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-import static heavy.test.plugin.logic.TestConstants.ROOT_CLOSURE_NAME
-import static heavy.test.plugin.logic.TestConstants.setBuildDir
+import static heavy.test.plugin.logic.TestConstants.*
 
 public class PluginImpl implements Plugin<Project> {
 
@@ -32,6 +32,8 @@ public class PluginImpl implements Plugin<Project> {
         //instrumentation start
         startTest(adbPath)
 
+        project.extensions.add(CONFIG_CLOSURE_NAME, new TestConfigWrapper())
+
         //run config
         project.extensions.add(ROOT_CLOSURE_NAME, new TestWrapper())
 
@@ -41,7 +43,7 @@ public class PluginImpl implements Plugin<Project> {
         }
     }
 
-    private void initTransport(String adbPath) {
+    private static void initTransport(String adbPath) {
         LogUtil.d(TAG, "initTransport...")
         String forwardCommand = adbPath + " forward tcp:10086 tcp:10001"
         Process forward = forwardCommand.execute()
@@ -49,14 +51,14 @@ public class PluginImpl implements Plugin<Project> {
         forward.waitFor()
     }
 
-    private void startTest(String adbPath) {
+    private static void startTest(String adbPath) {
         //start test
         LogUtil.d(TAG, "startTest...")
         String testCommand = adbPath + " shell am instrument -w -r -e class heavy.tool.test.activity.TestEntrance heavy.tool.test/android.support.test.runner.AndroidJUnitRunner"
         testCommand.execute()
     }
 
-    private int getLogLevel(Project project) {
+    private static int getLogLevel(Project project) {
 
         if (project.getLogger().isDebugEnabled()) {
             return LogUtil.LEVEL_DEBUG
