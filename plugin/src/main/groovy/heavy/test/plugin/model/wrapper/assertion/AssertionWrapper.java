@@ -1,19 +1,19 @@
 package heavy.test.plugin.model.wrapper.assertion;
 
+import heavy.test.plugin.model.data.Assertion;
+import heavy.test.plugin.model.data.TestObject;
 import heavy.test.plugin.model.data.assertion.data.Contains;
 import heavy.test.plugin.model.data.assertion.data.Empty;
 import heavy.test.plugin.model.data.assertion.data.EndWith;
 import heavy.test.plugin.model.data.assertion.data.Equals;
+import heavy.test.plugin.model.data.assertion.data.NullCheck;
 import heavy.test.plugin.model.data.assertion.data.StartWith;
 import heavy.test.plugin.model.data.assertion.view.Display;
+import heavy.test.plugin.model.data.assertion.view.FullScreen;
 import heavy.test.plugin.model.data.assertion.view.HasFocus;
 import heavy.test.plugin.model.data.assertion.view.WithText;
-import heavy.test.plugin.model.data.interf.ITestObject;
 import heavy.test.plugin.model.wrapper.interf.IDataAssertionWrapper;
 import heavy.test.plugin.model.wrapper.interf.IViewAssertionWrapper;
-import heavy.test.plugin.model.data.Assertion;
-import heavy.test.plugin.model.data.assertion.data.NullCheck;
-import heavy.test.plugin.model.data.assertion.view.FullScreen;
 
 /**
  * Created by heavy on 2017/5/31.
@@ -21,9 +21,9 @@ import heavy.test.plugin.model.data.assertion.view.FullScreen;
 
 public class AssertionWrapper implements IViewAssertionWrapper, IDataAssertionWrapper {
 
-    private ITestObject mAssertions;
+    private TestObject mAssertions;
 
-    public AssertionWrapper(ITestObject testObject) {
+    public AssertionWrapper(TestObject testObject) {
         mAssertions = testObject;
     }
 

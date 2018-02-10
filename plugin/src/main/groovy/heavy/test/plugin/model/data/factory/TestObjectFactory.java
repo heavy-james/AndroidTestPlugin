@@ -1,9 +1,19 @@
 package heavy.test.plugin.model.data.factory;
 
-import heavy.test.plugin.model.data.TestObject;
-import heavy.test.plugin.model.data.TestBlock;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+
+import heavy.test.plugin.model.data.TestObject;
+import heavy.test.plugin.util.LogUtil;
 
 /**
  * Created by heavy on 2017/6/11.
@@ -11,28 +21,40 @@ import org.json.JSONObject;
 
 public class TestObjectFactory {
 
-    public static final String OBJECT_TYPE_TESTABLE = "object_type_testable";
-    public static final String OBJECT_TYPE_ATOM = "object_type_atom";
-    public static final String OBJECT_TYPE_BLOCK = "object_type_block";
+    static final String TAG = "TestObjectFactory";
 
+    public static Gson mGson = null;
+
+    static {
+        mGson = new GsonBuilder().registerTypeAdapter(TestObject.class, new JsonDeserializer<TestObject>() {
+            @Override
+            public TestObject deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
+
+                JsonObject object = jsonElement.getAsJsonObject();
+                if (object.get("test_object_class") == null) {
+                    throw new JsonParseException("can not parson json object class : " + jsonElement.getAsString());
+                }
+
+                Class<?> clazz = null;
+                try {
+                    clazz = Class.forName(object.get("test_object_class").getAsString());
+                } catch (ClassNotFoundException e) {
+                    throw new JsonParseException("can not find class : " + object.get("test_object_class").getAsString());
+                }
+
+                return context.deserialize(jsonElement, clazz);
+            }
+        }).create();
+    }
 
     public static TestObject createTestObject(JSONObject object) {
+
+        LogUtil.d(TAG, "create createTestObject : " + object);
 
         if (object == null) {
             return null;
         }
-        if (OBJECT_TYPE_TESTABLE.equals(object.optString(TestObject.OBJECT_TYPE))) {
-            return TestableFactory.createTestable(object);
-        }
-        if (OBJECT_TYPE_ATOM.equals(object.optString(TestObject.OBJECT_TYPE))) {
-            return AtomFactory.createAtom(object);
-        }
-        if (OBJECT_TYPE_BLOCK.equals(object.optString(TestObject.OBJECT_TYPE))) {
-            TestObject testObject = new TestBlock();
-            testObject.parseJsonObject(object);
-            return testObject;
-        }
-        throw new IllegalArgumentException("unknown test object type : " + object.toString());
+        return mGson.fromJson(object.toString(), TestObject.class);
     }
 
 }

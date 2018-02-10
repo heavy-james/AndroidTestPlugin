@@ -1,9 +1,9 @@
 package heavy.test.plugin.model.wrapper;
 
-import heavy.test.plugin.model.data.Extra;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import heavy.test.plugin.model.data.Extra;
 
 /**
  * Created by heavy on 2017/5/20.

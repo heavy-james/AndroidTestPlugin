@@ -1,9 +1,8 @@
 package heavy.test.plugin.model.wrapper.reflection;
 
-import heavy.test.plugin.model.data.reflection.ObjectData;
-import heavy.test.plugin.model.data.reflection.MethodData;
-
 import groovy.lang.Closure;
+import heavy.test.plugin.model.data.reflection.MethodData;
+import heavy.test.plugin.model.data.reflection.ObjectData;
 
 /**
  * Created by heavy on 2017/6/2.

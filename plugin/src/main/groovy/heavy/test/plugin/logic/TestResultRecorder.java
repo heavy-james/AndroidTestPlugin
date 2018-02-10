@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import heavy.test.plugin.logic.command.RecordResult;
+import heavy.test.plugin.model.data.result.RecordResult;
 import heavy.test.plugin.util.FileUtil;
 import heavy.test.plugin.util.TextUtil;
 
@@ -20,8 +20,8 @@ public class TestResultRecorder {
     public static final String DEFAULT_RESULT_FILE_NAME = "/sdcard/test_result/" + "test_result.txt";
     private static final String TAG = "TestResultRecorder";
     public boolean isWriteThreadLive;
-    String mResultFileName;
     public boolean recordResult = true;
+    String mResultFileName;
     private ConcurrentLinkedQueue<ActionInfo> tempQueue = new ConcurrentLinkedQueue<ActionInfo>();
 
     public TestResultRecorder() {
@@ -51,23 +51,23 @@ public class TestResultRecorder {
     }
 
 
-    public void record(RecordResult recordResult) {
+    public void record(RecordResult testResult) {
 
-        switch (recordResult.getLevel()) {
+        switch (testResult.getLevel()) {
             case RecordResult.LEVEL_PAGE:
-                writePageInfo(recordResult.getTag(), recordResult.getInfo());
+                writePageInfo(testResult.getTag(), testResult.getInfo());
                 break;
             case RecordResult.LEVEL_CASE:
-                writeCaseInfo(recordResult.getTag(), recordResult.getInfo());
+                writeCaseInfo(testResult.getTag(), testResult.getInfo());
                 break;
             case RecordResult.LEVEL_TESTABLE:
-                writeTestableInfo(recordResult.getTag(), recordResult.getInfo());
+                writeTestableInfo(testResult.getTag(), testResult.getInfo());
                 break;
             case RecordResult.LEVEL_ACTION:
-                writeActionInfo(recordResult.getTag(), recordResult.getInfo());
+                writeActionInfo(testResult.getTag(), testResult.getInfo());
                 break;
             case RecordResult.LEVEL_DETAIL:
-                writeDetailInfo(recordResult.getTag(), recordResult.getInfo());
+                writeDetailInfo(testResult.getTag(), testResult.getInfo());
                 break;
         }
     }

@@ -1,19 +1,18 @@
 package heavy.test.plugin.model.wrapper;
 
+import groovy.lang.Closure;
 import heavy.test.plugin.model.data.TestContext;
-import heavy.test.plugin.model.data.interf.ITestObject;
+import heavy.test.plugin.model.data.TestObject;
+import heavy.test.plugin.model.data.Testable;
 import heavy.test.plugin.model.data.reflection.MethodData;
 import heavy.test.plugin.model.data.reflection.ObjectData;
 import heavy.test.plugin.model.data.reflection.RuntimeValue;
 import heavy.test.plugin.model.data.testable.data.TestableField;
 import heavy.test.plugin.model.data.testable.data.TestableMethod;
 import heavy.test.plugin.model.wrapper.testable.TestableWrapper;
+import heavy.test.plugin.model.wrapper.testable.data.TestableFieldWrapperView;
 import heavy.test.plugin.model.wrapper.testable.data.TestableMethodWrapperView;
 import heavy.test.plugin.util.TextUtil;
-import heavy.test.plugin.model.data.Testable;
-import heavy.test.plugin.model.wrapper.testable.data.TestableFieldWrapperView;
-
-import groovy.lang.Closure;
 
 /**
  * Created by heavy on 17/6/29.
@@ -21,10 +20,10 @@ import groovy.lang.Closure;
 
 public class TestObjectWrapper {
 
-    protected ITestObject mTestObject;
+    protected TestObject mTestObject;
     protected TestContext mTestContext;
 
-    public TestObjectWrapper(TestContext testContext, ITestObject testObject) {
+    public TestObjectWrapper(TestContext testContext, TestObject testObject) {
         this.mTestObject = testObject;
         this.mTestContext = testContext;
     }

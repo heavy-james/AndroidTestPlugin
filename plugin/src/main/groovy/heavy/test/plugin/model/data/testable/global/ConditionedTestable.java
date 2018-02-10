@@ -1,19 +1,18 @@
 package heavy.test.plugin.model.data.testable.global;
 
 
-import heavy.test.plugin.model.data.TestContext;
-import heavy.test.plugin.model.data.TestObject;
-
-import org.json.JSONObject;
+import org.gradle.internal.impldep.com.google.gson.annotations.SerializedName;
 
 import groovy.lang.Closure;
+import heavy.test.plugin.model.data.TestContext;
 
 /**
  * Created by heavy on 2017/5/31.
  */
 
-public class ConditionedTestable extends TestObject {
+public class ConditionedTestable extends GlobalTestable {
 
+    @SerializedName("conversed")
     boolean conversed;
     Closure conditionClosure;
     Closure trueCaseClosure;
@@ -21,6 +20,7 @@ public class ConditionedTestable extends TestObject {
     Closure preconditionClosure;
     long timeOut;
     private TestContext testContext;
+
     public ConditionedTestable(TestContext testContext) {
         this.testContext = testContext;
     }
@@ -79,18 +79,5 @@ public class ConditionedTestable extends TestObject {
 
     public void setPreconditionClosure(Closure preconditionClosure) {
         this.preconditionClosure = preconditionClosure;
-    }
-
-    @Override
-    public JSONObject getJsonObject() {
-        JSONObject result = super.getJsonObject();
-        result.put("converse", conversed);
-        return result;
-    }
-
-    @Override
-    public void parseJsonObject(JSONObject object) {
-        super.parseJsonObject(object);
-        conversed = object.optBoolean("converse");
     }
 }

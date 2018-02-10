@@ -1,20 +1,26 @@
 package heavy.test.plugin.model.wrapper.testable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import groovy.lang.Closure;
 import heavy.test.plugin.model.data.Action;
-import heavy.test.plugin.model.wrapper.ContextWrapper;
 import heavy.test.plugin.model.data.TestBlock;
 import heavy.test.plugin.model.data.TestContext;
+import heavy.test.plugin.model.data.TestObject;
 import heavy.test.plugin.model.data.Testable;
-import heavy.test.plugin.model.data.interf.ITestObject;
 import heavy.test.plugin.model.data.testable.global.ConditionedTestable;
-import heavy.test.plugin.model.data.testable.global.TestableDelay;
-import heavy.test.plugin.model.data.testable.global.TestableException;
-import heavy.test.plugin.model.data.testable.global.TestableMessage;
-import heavy.test.plugin.model.data.testable.global.TestableStop;
-import heavy.test.plugin.model.data.testable.global.TestableToast;
+import heavy.test.plugin.model.data.testable.global.Delay;
+import heavy.test.plugin.model.data.testable.global.MakeToast;
+import heavy.test.plugin.model.data.testable.global.SendMessage;
+import heavy.test.plugin.model.data.testable.global.StopTest;
+import heavy.test.plugin.model.data.testable.global.ThrowException;
 import heavy.test.plugin.model.data.testable.view.TestableAdapterView;
 import heavy.test.plugin.model.data.testable.view.TestableRecyclerView;
 import heavy.test.plugin.model.data.testable.view.TestableView;
+import heavy.test.plugin.model.wrapper.ContextWrapper;
 import heavy.test.plugin.model.wrapper.TestObjectWrapper;
 import heavy.test.plugin.model.wrapper.action.ActionWrapper;
 import heavy.test.plugin.model.wrapper.interf.IKeyEventWrapper;
@@ -25,13 +31,6 @@ import heavy.test.plugin.model.wrapper.testable.view.TestableRecyclerViewWrapper
 import heavy.test.plugin.model.wrapper.testable.view.TestableViewWrapper;
 import heavy.test.plugin.util.TextUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import groovy.lang.Closure;
-
 /**
  * Created by heavy on 2017/5/31.
  */
@@ -41,14 +40,14 @@ public class TestableWrapper extends TestObjectWrapper implements ITestableWrapp
     public static final String TAG = "TestableWrapper";
 
     private static List<TestContext> savedTestContexts = new ArrayList<>();
-    private static Map<String, ITestObject> cachedVars = new HashMap<>();
+    private static Map<String, TestObject> cachedVars = new HashMap<>();
 
 
-    public TestableWrapper(TestContext testContext, ITestObject testObject) {
+    public TestableWrapper(TestContext testContext, TestObject testObject) {
         super(testContext, testObject);
     }
 
-    public static void defVar(String name, ITestObject testObject) {
+    public static void defVar(String name, TestObject testObject) {
         cachedVars.put(name, testObject);
     }
 
@@ -68,7 +67,7 @@ public class TestableWrapper extends TestObjectWrapper implements ITestableWrapp
         }
     }
 
-    public ITestObject useVar(String name) {
+    public TestObject useVar(String name) {
         return cachedVars.get(name);
     }
 
@@ -153,7 +152,7 @@ public class TestableWrapper extends TestObjectWrapper implements ITestableWrapp
 
     @Override
     public Testable getAdapterView(String name, Closure closure) {
-        ITestObject testObject = mTestContext.getTestObject(name).clean();
+        TestObject testObject = mTestContext.getTestObject(name).clean();
         TestableAdapterView result = (TestableAdapterView) testObject;
         closure.setDelegate(new TestableAdapterViewWrapper(result));
         closure.setResolveStrategy(Closure.DELEGATE_ONLY);
@@ -166,7 +165,7 @@ public class TestableWrapper extends TestObjectWrapper implements ITestableWrapp
 
     @Override
     public Testable getRecyclerView(String name, Closure closure) {
-        ITestObject testObject = mTestContext.getTestObject(name).clean();
+        TestObject testObject = mTestContext.getTestObject(name).clean();
         TestableRecyclerView result = (TestableRecyclerView) testObject;
         closure.setDelegate(new TestableAdapterViewWrapper(result));
         closure.setResolveStrategy(Closure.DELEGATE_ONLY);
@@ -179,7 +178,7 @@ public class TestableWrapper extends TestObjectWrapper implements ITestableWrapp
 
     @Override
     public Testable getView(String name, Closure closure) {
-        ITestObject testObject = mTestContext.getTestObject(name).clean();
+        TestObject testObject = mTestContext.getTestObject(name).clean();
         TestableView result = (TestableView) testObject;
         closure.setDelegate(new TestableViewWrapper(result));
         closure.setResolveStrategy(Closure.DELEGATE_ONLY);
@@ -192,7 +191,7 @@ public class TestableWrapper extends TestObjectWrapper implements ITestableWrapp
 
     @Override
     public Testable makeToast(String msg, long time) {
-        Testable testable = new TestableToast(msg, time);
+        Testable testable = new MakeToast(msg, time);
         if (mTestObject != null) {
             mTestObject.addContentObject(testable);
         }
@@ -206,7 +205,7 @@ public class TestableWrapper extends TestObjectWrapper implements ITestableWrapp
 
     @Override
     public Testable printMessage(String msg) {
-        Testable testable = new TestableMessage(msg);
+        Testable testable = new SendMessage(msg);
         if (mTestObject != null) {
             mTestObject.addContentObject(testable);
         }
@@ -215,7 +214,7 @@ public class TestableWrapper extends TestObjectWrapper implements ITestableWrapp
 
     @Override
     public Testable stopTest(String msg) {
-        Testable testable = new TestableStop(msg);
+        Testable testable = new StopTest(msg);
         if (mTestObject != null) {
             mTestObject.addContentObject(testable);
         }
@@ -224,7 +223,7 @@ public class TestableWrapper extends TestObjectWrapper implements ITestableWrapp
 
     @Override
     public Testable throwException(String msg) {
-        Testable testable = new TestableException(msg);
+        Testable testable = new ThrowException(msg);
         if (mTestObject != null) {
             mTestObject.addContentObject(testable);
         }
@@ -233,33 +232,33 @@ public class TestableWrapper extends TestObjectWrapper implements ITestableWrapp
 
     @Override
     public Testable delay(long time) {
-        Testable testable = new TestableDelay(time);
+        Testable testable = new Delay(time);
         if (mTestObject != null) {
             mTestObject.addContentObject(testable);
         }
         return testable;
     }
 
-    public ITestObject doIf(Closure closure) {
+    public TestObject doIf(Closure closure) {
         ConditionedTestableWrapper wrapper = new ConditionedTestableWrapper(mTestContext, new ConditionedTestable(mTestContext));
         closure.setResolveStrategy(Closure.DELEGATE_ONLY);
         closure.setDelegate(wrapper);
         closure.call();
-        ITestObject testObject = wrapper.getConditionedTestable();
+        TestObject testObject = wrapper.getConditionedTestable();
         if (mTestObject != null) {
             mTestObject.addContentObject(testObject);
         }
         return testObject;
     }
 
-    public ITestObject doIfNot(Closure closure) {
+    public TestObject doIfNot(Closure closure) {
         ConditionedTestable testable = (ConditionedTestable) doIf(closure);
         testable.setConversed(true);
         return testable;
     }
 
-    public ITestObject block(Closure closure) {
-        ITestObject testObject = new TestBlock();
+    public TestObject block(Closure closure) {
+        TestObject testObject = new TestBlock();
         TestableWrapper testableWrapper = new TestableWrapper(mTestContext, testObject);
         closure.setResolveStrategy(Closure.DELEGATE_ONLY);
         closure.setDelegate(testableWrapper);
@@ -270,11 +269,11 @@ public class TestableWrapper extends TestObjectWrapper implements ITestableWrapp
         return testObject;
     }
 
-    public ITestObject waitUntil(Closure closure) {
+    public TestObject waitUntil(Closure closure) {
         return doIf(closure);
     }
 
-    public ITestObject getTestObject() {
+    public TestObject getTestObject() {
         return mTestObject;
     }
 

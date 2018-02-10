@@ -1,14 +1,14 @@
 package heavy.test.plugin.model.wrapper.action;
 
 import heavy.test.plugin.model.data.Action;
-import heavy.test.plugin.model.data.action.view.Click;
-import heavy.test.plugin.model.data.action.view.KeyPress;
-import heavy.test.plugin.model.data.interf.ITestObject;
-import heavy.test.plugin.model.wrapper.interf.IActionWrapper;
+import heavy.test.plugin.model.data.TestObject;
 import heavy.test.plugin.model.data.action.global.Delay;
 import heavy.test.plugin.model.data.action.view.Check;
+import heavy.test.plugin.model.data.action.view.Click;
 import heavy.test.plugin.model.data.action.view.Focus;
 import heavy.test.plugin.model.data.action.view.KeyEvent;
+import heavy.test.plugin.model.data.action.view.KeyPress;
+import heavy.test.plugin.model.wrapper.interf.IActionWrapper;
 import heavy.test.plugin.model.wrapper.interf.IKeyEventWrapper;
 
 /**
@@ -29,9 +29,9 @@ public class ActionWrapper implements IActionWrapper, IKeyEventWrapper {
     public static final int KEYCODE_POWER = 26;
     public static final int KEYCODE_MENU = 82;
 
-    protected ITestObject mTestObject;
+    protected TestObject mTestObject;
 
-    public ActionWrapper(ITestObject testObject) {
+    public ActionWrapper(TestObject testObject) {
         this.mTestObject = testObject;
     }
 
@@ -171,7 +171,7 @@ public class ActionWrapper implements IActionWrapper, IKeyEventWrapper {
         return action;
     }
 
-    public ITestObject getActions() {
+    public TestObject getActions() {
         return mTestObject;
     }
 }

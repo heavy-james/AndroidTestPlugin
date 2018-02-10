@@ -64,4 +64,8 @@ public class SocketClient {
             e.printStackTrace();
         }
     }
+
+    public boolean isClosed() {
+        return socket == null || socket.isClosed();
+    }
 }

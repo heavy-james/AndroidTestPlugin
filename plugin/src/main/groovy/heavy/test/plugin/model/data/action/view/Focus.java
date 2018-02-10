@@ -1,9 +1,9 @@
 package heavy.test.plugin.model.data.action.view;
 
-import heavy.test.plugin.model.data.Action;
-import heavy.test.plugin.model.data.factory.ActionFactory;
 
-import org.json.JSONObject;
+import com.google.gson.annotations.SerializedName;
+
+import heavy.test.plugin.model.data.Action;
 
 /**
  * Created by heavy on 2017/5/20.
@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 public class Focus extends Action {
 
+    @SerializedName("focused")
     boolean focused;
 
     public Focus(boolean focused) {
@@ -19,28 +20,5 @@ public class Focus extends Action {
 
     public boolean hasFocus() {
         return focused;
-    }
-
-    @Override
-    public String getActionType() {
-        return ActionFactory.ACTION_FOCUS;
-    }
-
-    @Override
-    public String getDescription() {
-        return null;
-    }
-
-    @Override
-    public JSONObject getJsonObject() {
-        JSONObject object = super.getJsonObject();
-        object.putOpt("value", focused);
-        return object;
-    }
-
-    @Override
-    public void parseJsonObject(JSONObject object) {
-        super.parseJsonObject(object);
-        focused = object.optBoolean("value");
     }
 }

@@ -1,13 +1,13 @@
 package heavy.test.plugin.model.data.reflection;
 
-import heavy.test.plugin.model.data.interf.IJsonable;
-import heavy.test.plugin.util.TextUtil;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import heavy.test.plugin.model.data.interf.IJsonable;
+import heavy.test.plugin.util.TextUtil;
 
 /**
  * Created by heavy on 2017/6/2.

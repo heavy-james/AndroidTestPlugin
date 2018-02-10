@@ -1,5 +1,7 @@
 package heavy.test.plugin.logic;
 
+import com.google.gson.Gson;
+
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -7,16 +9,15 @@ import java.net.Socket;
 import java.util.List;
 
 import groovy.lang.Closure;
-import heavy.test.plugin.logic.command.GetRuntimeValue;
-import heavy.test.plugin.logic.command.RecordResult;
-import heavy.test.plugin.logic.command.RunTestObject;
 import heavy.test.plugin.logic.transport.SocketClient;
 import heavy.test.plugin.model.data.TestBlock;
 import heavy.test.plugin.model.data.TestContext;
 import heavy.test.plugin.model.data.TestObject;
-import heavy.test.plugin.model.data.interf.ITestObject;
+import heavy.test.plugin.model.data.factory.TestObjectFactory;
 import heavy.test.plugin.model.data.reflection.RuntimeValue;
+import heavy.test.plugin.model.data.result.RecordResult;
 import heavy.test.plugin.model.data.testable.global.ConditionedTestable;
+import heavy.test.plugin.model.data.testable.global.GetRuntimeValue;
 import heavy.test.plugin.model.wrapper.testable.TestableWrapper;
 import heavy.test.plugin.util.LogUtil;
 
@@ -31,8 +32,9 @@ public class TestManager {
     private static TestManager instance;
     SocketClient socketClient;
     TestResultRecorder testResult;
-    private boolean stopWhenError;
     Closure whenTestError;
+    Gson mGson = new Gson();
+    private boolean stopWhenError;
 
     private TestManager() {
         testResult = new TestResultRecorder(TestConstants.getResultFileName());
@@ -76,19 +78,19 @@ public class TestManager {
         this.stopWhenError = stopWhenError;
     }
 
-    public boolean execute(TestCommand testCommand) throws RuntimeException {
+    public boolean execute(TestObject testCommand) throws RuntimeException {
         if (testCommand instanceof RecordResult) {
-            RecordResult recordResult = (RecordResult) testCommand;
-            testResult.record(recordResult);
-            if (recordResult.isFailed()) {
-                if (recordResult.isRunAsCondition()) {
+            RecordResult testResult = (RecordResult) testCommand;
+            this.testResult.record(testResult);
+            if (testResult.isFailed()) {
+                if (testResult.isRunAsCondition()) {
                     return false;
                 } else {
                     if (whenTestError != null) {
                         whenTestError.call();
                     }
 
-                    if (testResult.needRecordResult()) {
+                    if (this.testResult.needRecordResult()) {
                         for (String command : TestConstants.getTestDataCollectingCommands()) {
                             LogUtil.d(TAG, "data collection executing : " + command);
                             try {
@@ -103,7 +105,7 @@ public class TestManager {
                         }
                     }
                     if (stopWhenError) {
-                        throw new RuntimeException(recordResult.getInfo());
+                        throw new RuntimeException(testResult.getInfo());
                     }
                 }
             }
@@ -116,22 +118,26 @@ public class TestManager {
         return runtimeValue;
     }
 
-    public boolean sendForResult(TestCommand testCommand) {
+    public boolean sendForResult(TestObject testCommand) {
 
-        TestCommand responseCommand = null;
+        TestObject responseCommand = null;
         if (socketClient != null && testCommand != null) {
-            LogUtil.d(TAG, "sendForResult testCommand : " + testCommand.getJsonObject().toString());
-            socketClient.println(testCommand.getJsonObject().toString());
+
+            LogUtil.d(TAG, "sendForResult testCommand : " + testCommand);
+
+            String data = testCommand.getJsonObject().toString();
+
+            LogUtil.d(TAG, "sendForResult testCommandData : " + data);
+
+            socketClient.println(data);
+
             String resultString = socketClient.readLine();
-            if (resultString != null) {
-                try {
-                    LogUtil.d(TAG, "received string : " + resultString);
-                    responseCommand = TestCommandFactory.createCommand(new JSONObject(resultString));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else {
-                LogUtil.w(TAG, "received null string from test apk.");
+
+            try {
+                LogUtil.d(TAG, "received string : " + resultString);
+                responseCommand = TestObjectFactory.createTestObject(new JSONObject(resultString));
+            } catch (Exception e) {
+                throw new IllegalStateException("received unexpected test result from server : " + resultString);
             }
         }
 
@@ -148,7 +154,7 @@ public class TestManager {
         return execute(responseCommand);
     }
 
-    public boolean runTestObject(ITestObject testObject) {
+    public boolean runTestObject(TestObject testObject) {
         boolean result = true;
         if (testObject != null) {
             for (int i = 0; i < testObject.getRepeatCount(); i++) {
@@ -160,35 +166,36 @@ public class TestManager {
                     result &= runTestObjects(1, testObject.getContentObjects());
                     continue;
                 }
-                result &= sendForResult(new RunTestObject(testObject));
+                result &= sendForResult(testObject);
             }
         }
         return result;
     }
 
-    public boolean runTestObjects(int repeatCount, List<ITestObject> testObjects) {
+    public boolean runTestObjects(int repeatCount, List<TestObject> testObjects) {
         boolean result = true;
         if (testObjects != null) {
             for (int i = 0; i < repeatCount; i++) {
-                for (ITestObject iTestObject : testObjects) {
-                    result &= TestManager.getInstance().runTestObject(iTestObject);
+                for (TestObject TestObject : testObjects) {
+                    result &= TestManager.getInstance().runTestObject(TestObject);
                 }
             }
         }
         return result;
     }
 
-    public boolean checkCondition(ITestObject testObject) {
+    public boolean checkCondition(TestObject testObject) {
         boolean result = true;
         if (testObject != null) {
-            for (ITestObject iTestObject : testObject.getContentObjects()) {
-                result &= TestManager.getInstance().sendForResult(new RunTestObject(iTestObject).setRunAsCondition(true));
+            for (TestObject TestObject : testObject.getContentObjects()) {
+                TestObject.setRunAsCondition(true);
+                result &= TestManager.getInstance().sendForResult(TestObject);
             }
         }
         return result;
     }
 
-    public ITestObject getTestObjectFromClosure(TestContext testContext, Closure closure) {
+    public TestObject getTestObjectFromClosure(TestContext testContext, Closure closure) {
         if (closure != null) {
             TestableWrapper testableWrapper = new TestableWrapper(testContext, new TestObject());
             closure.setDelegate(testableWrapper);
@@ -204,10 +211,10 @@ public class TestManager {
         if (conditionedTestable == null) {
             return;
         }
-        ITestObject conditionObject = getTestObjectFromClosure(conditionedTestable.getTestContext(), conditionedTestable.getConditionClosure());
-        ITestObject preConditionObject = getTestObjectFromClosure(conditionedTestable.getTestContext(), conditionedTestable.getPreconditionClosure());
-        ITestObject trueCaseObject = getTestObjectFromClosure(conditionedTestable.getTestContext(), conditionedTestable.getTrueCaseClosure());
-        ITestObject falseCaseObject = getTestObjectFromClosure(conditionedTestable.getTestContext(), conditionedTestable.getFalseCaseClosure());
+        TestObject conditionObject = getTestObjectFromClosure(conditionedTestable.getTestContext(), conditionedTestable.getConditionClosure());
+        TestObject preConditionObject = getTestObjectFromClosure(conditionedTestable.getTestContext(), conditionedTestable.getPreconditionClosure());
+        TestObject trueCaseObject = getTestObjectFromClosure(conditionedTestable.getTestContext(), conditionedTestable.getTrueCaseClosure());
+        TestObject falseCaseObject = getTestObjectFromClosure(conditionedTestable.getTestContext(), conditionedTestable.getFalseCaseClosure());
 
         long counter = 0;
         boolean conditionSatisfied = TestManager.getInstance().checkCondition(conditionObject);
@@ -227,7 +234,7 @@ public class TestManager {
         conditionSatisfied &= counter <= conditionedTestable.getTimeOut();
         conditionSatisfied ^= conditionedTestable.isConversed();
 
-        ITestObject testObject = null;
+        TestObject testObject = null;
         if (conditionSatisfied) {
             testObject = trueCaseObject;
         } else {

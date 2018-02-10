@@ -1,99 +1,88 @@
 package heavy.test.plugin.model.data;
 
-import heavy.test.plugin.model.data.interf.ITestObject;
-import heavy.test.plugin.model.data.factory.TestObjectFactory;
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Created by heavy on 2017/6/10.
  */
 
-public class TestObject implements ITestObject {
+public class TestObject {
 
-    public static final String OBJECT_TYPE = "object_type";
+    static Gson mGson = new Gson();
 
     /**
      * the type of this object, used to rebuild object from json data
      */
+    @SerializedName("test_object_class")
     protected String objectType;
-
+    @SerializedName("description")
+    protected String description;
     /**
      * a test object is a also a container, this is the test objects hold by this container
      */
-    List<ITestObject> contentObjects;
-
+    @SerializedName("content_objects")
+    List<TestObject> contentObjects;
+    @SerializedName("repeat")
     int repeatCount = 1;
+    @SerializedName("run_as_condition")
+    private boolean runAsCondition;
 
     public TestObject() {
         contentObjects = new ArrayList<>();
+        objectType = getClass().getName();
     }
 
-    @Override
     public int getRepeatCount() {
         return repeatCount;
     }
 
-    public void setRepeatCount(int repeatCount) {
+    public TestObject setRepeatCount(int repeatCount) {
         this.repeatCount = repeatCount;
+        return this;
     }
 
-    @Override
-    public ITestObject clean() {
+    public TestObject clean() {
         contentObjects.clear();
         return this;
     }
 
-    @Override
-    public void parseJsonObject(JSONObject object) {
-        objectType = object.optString(OBJECT_TYPE);
-        JSONArray contentObjectsArray = object.optJSONArray("content_objects");
-        if (contentObjectsArray != null) {
-            for (int i = 0; i < contentObjectsArray.length(); i++) {
-                ITestObject testObject = TestObjectFactory.createTestObject(contentObjectsArray.optJSONObject(i));
-                contentObjects.add(testObject);
-            }
-        }
-        repeatCount = object.optInt("repeat", 1);
-    }
-
-    @Override
-    public JSONObject getJsonObject() {
-        JSONObject result = new JSONObject();
-        if (contentObjects != null && contentObjects.size() > 0) {
-            JSONArray contentObjectsArray = new JSONArray();
-            for (ITestObject testObject : contentObjects) {
-                if (testObject != null) {
-                    contentObjectsArray.put(testObject.getJsonObject());
-                }
-            }
-            result.put("content_objects", contentObjectsArray);
-        }
-        if (repeatCount != 1) {
-            result.put("repeat", repeatCount);
-        }
-        result.putOpt(OBJECT_TYPE, objectType);
-        return result;
-    }
-
-    @Override
     public String getObjectType() {
-        return null;
+        return getClass().getName();
     }
 
-    @Override
-    public List<ITestObject> getContentObjects() {
+    public List<TestObject> getContentObjects() {
         return contentObjects;
     }
 
-    @Override
-    public void addContentObject(ITestObject testObject) {
+    public void addContentObject(TestObject testObject) {
         contentObjects.add(testObject);
     }
 
+    public String getDescription() {
+        return description;
+    }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isRunAsCondition() {
+        return runAsCondition;
+    }
+
+    public TestObject setRunAsCondition(boolean runAsCondition) {
+        this.runAsCondition = runAsCondition;
+        return this;
+    }
+
+    public JSONObject getJsonObject() {
+        return new JSONObject(mGson.toJson(this));
+    }
 }

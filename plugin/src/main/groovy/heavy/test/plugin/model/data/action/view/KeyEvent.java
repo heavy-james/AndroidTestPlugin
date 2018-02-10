@@ -1,9 +1,8 @@
 package heavy.test.plugin.model.data.action.view;
 
-import heavy.test.plugin.model.data.Action;
-import heavy.test.plugin.model.data.factory.ActionFactory;
+import com.google.gson.annotations.SerializedName;
 
-import org.json.JSONObject;
+import heavy.test.plugin.model.data.Action;
 
 /**
  * Created by heavy on 2017/5/20.
@@ -11,22 +10,14 @@ import org.json.JSONObject;
 
 public class KeyEvent extends Action {
 
+    @SerializedName("key_code")
     public int keyCode;
+    @SerializedName("event_action")
     public String eventAction;
 
     public KeyEvent(int keyCode, String eventAction) {
         this.keyCode = keyCode;
         this.eventAction = eventAction;
-    }
-
-    @Override
-    public String getActionType() {
-        return ActionFactory.ACTION_KEY_EVENT;
-    }
-
-    @Override
-    public String getDescription() {
-        return null;
     }
 
     public int getKeyCode() {
@@ -35,21 +26,5 @@ public class KeyEvent extends Action {
 
     public String getEventAction() {
         return eventAction;
-    }
-
-    @Override
-    public JSONObject getJsonObject() {
-        JSONObject result = super.getJsonObject();
-        JSONObject value = new JSONObject();
-        value.putOpt("keyCode", keyCode);
-        value.putOpt("eventAction", eventAction);
-        return result;
-    }
-
-    @Override
-    public void parseJsonObject(JSONObject object) {
-        super.parseJsonObject(object);
-        keyCode = object.optInt("keyCode");
-        eventAction = object.optString("eventAction");
     }
 }

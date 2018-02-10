@@ -1,7 +1,7 @@
 package heavy.test.plugin.model.wrapper.testable.data;
 
-import heavy.test.plugin.model.data.testable.data.TestableMethod;
 import heavy.test.plugin.model.data.Assertion;
+import heavy.test.plugin.model.data.testable.data.TestableMethod;
 import heavy.test.plugin.model.wrapper.assertion.AssertionWrapper;
 import heavy.test.plugin.model.wrapper.interf.IDataAssertionWrapper;
 import heavy.test.plugin.model.wrapper.reflection.MethodDataWrapper;

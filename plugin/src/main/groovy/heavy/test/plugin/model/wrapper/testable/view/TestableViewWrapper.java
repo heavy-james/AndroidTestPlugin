@@ -1,22 +1,18 @@
 package heavy.test.plugin.model.wrapper.testable.view;
 
+import groovy.lang.Closure;
 import heavy.test.plugin.model.data.Action;
 import heavy.test.plugin.model.data.Assertion;
-import heavy.test.plugin.model.data.factory.TestableViewFactory;
 import heavy.test.plugin.model.data.testable.view.TestableView;
 import heavy.test.plugin.model.wrapper.action.ActionWrapper;
 import heavy.test.plugin.model.wrapper.assertion.AssertionWrapper;
 import heavy.test.plugin.model.wrapper.interf.IViewAssertionWrapper;
-
-import groovy.lang.Closure;
 
 /**
  * Created by heavy on 2017/5/20.
  */
 
 public class TestableViewWrapper extends ActionWrapper implements IViewAssertionWrapper {
-
-    protected String mType = TestableViewFactory.TYPE_VIEW;
 
     TestableView mTestableView;
 

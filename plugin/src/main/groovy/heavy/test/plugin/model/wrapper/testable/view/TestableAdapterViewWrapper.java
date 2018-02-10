@@ -1,10 +1,9 @@
 package heavy.test.plugin.model.wrapper.testable.view;
 
 
+import groovy.lang.Closure;
 import heavy.test.plugin.model.data.testable.view.TestableAdapterView;
 import heavy.test.plugin.model.data.testable.view.TestableView;
-
-import groovy.lang.Closure;
 
 /**
  * Created by heavy on 2017/5/20.

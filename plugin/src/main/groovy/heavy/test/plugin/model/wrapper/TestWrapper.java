@@ -1,17 +1,15 @@
 package heavy.test.plugin.model.wrapper;
 
+import groovy.lang.Closure;
+import heavy.test.plugin.logic.TestManager;
 import heavy.test.plugin.model.data.Action;
 import heavy.test.plugin.model.data.TestContext;
 import heavy.test.plugin.model.data.TestObject;
-import heavy.test.plugin.model.data.interf.ITestObject;
-import heavy.test.plugin.model.wrapper.testable.TestableWrapper;
-import heavy.test.plugin.logic.TestManager;
-import heavy.test.plugin.logic.command.SetUpActivity;
 import heavy.test.plugin.model.data.Testable;
 import heavy.test.plugin.model.data.testable.global.ConditionedTestable;
+import heavy.test.plugin.model.data.testable.global.SetUpActivity;
+import heavy.test.plugin.model.wrapper.testable.TestableWrapper;
 import heavy.test.plugin.util.LogUtil;
-
-import groovy.lang.Closure;
 
 /**
  * Created by heavy on 2017/6/20.
@@ -158,8 +156,8 @@ public class TestWrapper extends TestableWrapper {
     }
 
     @Override
-    public ITestObject block(Closure closure) {
-        ITestObject testObject = super.block(closure);
+    public TestObject block(Closure closure) {
+        TestObject testObject = super.block(closure);
         TestManager.getInstance().runTestObjects(testObject.getRepeatCount(), testObject.getContentObjects());
         return null;
     }

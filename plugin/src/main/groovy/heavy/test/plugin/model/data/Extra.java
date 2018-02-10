@@ -1,8 +1,8 @@
 package heavy.test.plugin.model.data;
 
-import heavy.test.plugin.util.TextUtil;
-
 import org.json.JSONObject;
+
+import heavy.test.plugin.util.TextUtil;
 
 /**
  * Created by heavy on 2017/5/20.

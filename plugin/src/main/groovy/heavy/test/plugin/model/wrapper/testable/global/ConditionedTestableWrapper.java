@@ -1,10 +1,9 @@
 package heavy.test.plugin.model.wrapper.testable.global;
 
+import groovy.lang.Closure;
 import heavy.test.plugin.model.data.TestContext;
 import heavy.test.plugin.model.data.testable.global.ConditionedTestable;
 import heavy.test.plugin.model.wrapper.TestObjectWrapper;
-
-import groovy.lang.Closure;
 
 /**
  * Created by heavy on 17/6/28.

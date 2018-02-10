@@ -1,9 +1,9 @@
 package heavy.test.plugin.model.wrapper.reflection;
 
-import heavy.test.plugin.model.data.reflection.RuntimeValue;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import heavy.test.plugin.model.data.reflection.RuntimeValue;
 
 /**
  * Created by heavy on 2017/6/4.

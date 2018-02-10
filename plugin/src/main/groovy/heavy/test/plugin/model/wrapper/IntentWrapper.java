@@ -1,8 +1,7 @@
 package heavy.test.plugin.model.wrapper;
 
-import heavy.test.plugin.model.data.IntentData;
-
 import groovy.lang.Closure;
+import heavy.test.plugin.model.data.IntentData;
 
 /**
  * Created by heavy on 2017/5/20.

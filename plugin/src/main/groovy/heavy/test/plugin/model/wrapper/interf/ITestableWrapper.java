@@ -1,8 +1,7 @@
 package heavy.test.plugin.model.wrapper.interf;
 
-import heavy.test.plugin.model.data.Testable;
-
 import groovy.lang.Closure;
+import heavy.test.plugin.model.data.Testable;
 
 /**
  * Created by heavy on 2017/5/31.

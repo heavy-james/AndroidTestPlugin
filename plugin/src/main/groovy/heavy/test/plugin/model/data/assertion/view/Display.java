@@ -1,9 +1,9 @@
 package heavy.test.plugin.model.data.assertion.view;
 
-import heavy.test.plugin.model.data.factory.AssertionFactory;
-import heavy.test.plugin.model.data.Assertion;
 
-import org.json.JSONObject;
+import com.google.gson.annotations.SerializedName;
+
+import heavy.test.plugin.model.data.Assertion;
 
 /**
  * Created by heavy on 2017/5/20.
@@ -11,15 +11,11 @@ import org.json.JSONObject;
 
 public class Display extends Assertion {
 
+    @SerializedName("displayed")
     boolean displayed;
 
     public Display(boolean displayed) {
         this.displayed = displayed;
-    }
-
-    @Override
-    public String getAssertionType() {
-        return AssertionFactory.VIEW_ASSERTION_DISPLAY;
     }
 
     public boolean isDisplayed() {
@@ -28,18 +24,5 @@ public class Display extends Assertion {
 
     public void setDisplayed(boolean displayed) {
         this.displayed = displayed;
-    }
-
-    @Override
-    public JSONObject getJsonObject() {
-        JSONObject result = super.getJsonObject();
-        result.putOpt("displayed", displayed);
-        return result;
-    }
-
-    @Override
-    public void parseJsonObject(JSONObject object) {
-        super.parseJsonObject(object);
-        displayed = object.optBoolean("displayed");
     }
 }

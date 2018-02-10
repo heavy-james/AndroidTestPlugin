@@ -1,10 +1,10 @@
 package heavy.test.plugin.model.wrapper.testable.data;
 
+import heavy.test.plugin.model.data.Assertion;
 import heavy.test.plugin.model.data.testable.data.TestableField;
+import heavy.test.plugin.model.wrapper.assertion.AssertionWrapper;
 import heavy.test.plugin.model.wrapper.interf.IDataAssertionWrapper;
 import heavy.test.plugin.model.wrapper.reflection.ObjectDataWrapper;
-import heavy.test.plugin.model.data.Assertion;
-import heavy.test.plugin.model.wrapper.assertion.AssertionWrapper;
 
 /**
  * Created by heavy on 2017/6/2.

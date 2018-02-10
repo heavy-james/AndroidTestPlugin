@@ -1,9 +1,9 @@
 package heavy.test.plugin.model.data.reflection;
 
+import org.json.JSONObject;
+
 import heavy.test.plugin.model.data.interf.IJsonable;
 import heavy.test.plugin.util.TextUtil;
-
-import org.json.JSONObject;
 
 /**
  * Created by heavy on 2017/6/2.

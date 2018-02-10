@@ -1,10 +1,10 @@
 package heavy.test.plugin.model.data.assertion.data;
 
+
+import com.google.gson.annotations.SerializedName;
+
 import heavy.test.plugin.model.data.Assertion;
 import heavy.test.plugin.model.data.Extra;
-import heavy.test.plugin.model.data.factory.AssertionFactory;
-
-import org.json.JSONObject;
 
 /**
  * Created by heavy on 2017/6/2.
@@ -12,8 +12,8 @@ import org.json.JSONObject;
 
 public class Equals extends Assertion {
 
+    @SerializedName("ignore_case")
     boolean ignoreCase;
-    boolean conversed;
 
     public Equals(String content) {
         description = content;
@@ -36,40 +36,7 @@ public class Equals extends Assertion {
         this.ignoreCase = ignoreCase;
     }
 
-    public boolean isConversed() {
-        return conversed;
-    }
-
-    public void setConversed(boolean conversed) {
-        this.conversed = conversed;
-    }
-
-
-    @Override
-    public String getAssertionType() {
-        return AssertionFactory.DATA_ASSERTION_EQUALS;
-    }
-
     public String getContent() {
         return description;
-    }
-
-    @Override
-    public JSONObject getJsonObject() {
-        JSONObject result = super.getJsonObject();
-        if (ignoreCase) {
-            result.putOpt("ignore_case", ignoreCase);
-        }
-        if (conversed) {
-            result.putOpt("conversed", conversed);
-        }
-        return result;
-    }
-
-    @Override
-    public void parseJsonObject(JSONObject object) {
-        super.parseJsonObject(object);
-        ignoreCase = object.optBoolean("ignore_case");
-        conversed = object.optBoolean("conversed");
     }
 }
