@@ -8,6 +8,8 @@ import heavy.test.plugin.model.data.action.view.Click;
 import heavy.test.plugin.model.data.action.view.Focus;
 import heavy.test.plugin.model.data.action.view.KeyEvent;
 import heavy.test.plugin.model.data.action.view.KeyPress;
+import heavy.test.plugin.model.data.action.view.SetText;
+import heavy.test.plugin.model.data.action.view.TypeText;
 import heavy.test.plugin.model.wrapper.interf.IActionWrapper;
 import heavy.test.plugin.model.wrapper.interf.IKeyEventWrapper;
 
@@ -165,6 +167,22 @@ public class ActionWrapper implements IActionWrapper, IKeyEventWrapper {
 
     public Action delay(long delayMillis) {
         Action action = new Delay(delayMillis);
+        if (mTestObject != null) {
+            mTestObject.addContentObject(action);
+        }
+        return action;
+    }
+
+    public Action setText(String content){
+        Action action = new SetText(content);
+        if (mTestObject != null) {
+            mTestObject.addContentObject(action);
+        }
+        return action;
+    }
+
+    public Action typeText(String content){
+        Action action = new TypeText(content);
         if (mTestObject != null) {
             mTestObject.addContentObject(action);
         }
